@@ -1,35 +1,55 @@
 import React from 'react'
-import { graphql, useStaticQuery } from 'gatsby'
+import { graphql, Link, useStaticQuery } from 'gatsby'
+import Head from '../components/head'
 
 import Layout from '../components/Layout'
 
+import classes from './blog.module.scss'
+
 const BlogPage = () => {
+  // const data = useStaticQuery(graphql`
+  //   query {
+  //     allMarkdownRemark {
+  //       edges {
+  //         node {
+  //           frontmatter {
+  //             title
+  //             date
+  //           }
+  //           fields {
+  //             slug
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // `)
   const data = useStaticQuery(graphql`
     query {
-      allMarkdownRemark {
+      allContentfulBlogPost(sort: { fields: publishedDate, order: DESC }) {
         edges {
           node {
-            frontmatter {
-              title
-              date
-            }
-            html
+            title
+            slug
+            publishedDate(formatString: "DD/MM/YYYY HH:MM")
           }
         }
       }
     }
   `)
-  const postsArray = data.allMarkdownRemark.edges
-  console.log(postsArray[1])
+
+  const postsArray = data.allContentfulBlogPost.edges
   return (
     <Layout>
+      <Head title="Blog" />
       <h1>Blog</h1>
-      <p>Posts will show up here later on.</p>
-      <ol>
+      <ol className={classes.posts}>
         {postsArray.map(({ node }) => (
-          <li key={Math.random()}>
-            <h2>{node.frontmatter.title}</h2>
-            <p>{node.frontmatter.date}</p>
+          <li className={classes.post} key={Math.random()}>
+            <Link to={node.slug}>
+              <h2>{node.title}</h2>
+              <p>{node.publishedDate}</p>
+            </Link>
           </li>
         ))}
       </ol>
